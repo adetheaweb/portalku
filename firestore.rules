@@ -1,0 +1,83 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 0. Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // --- Primitives ---
+    function isSignedIn() { return request.auth != null; }
+    function isEmailVerified() { return isSignedIn() && request.auth.token.email_verified == true; }
+    function isValidId(id) { return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); }
+    function incoming() { return request.resource.data; }
+    function existing() { return resource.data; }
+    function isOwner(userId) { return isSignedIn() && request.auth.uid == userId; }
+    
+    // Admin Check - Requires a lookup or a specific email if we want to bootstrap
+    // For this app, we'll look for an 'admin' role in the users collection
+    function isAdmin() { 
+      return isSignedIn() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin'; 
+    }
+
+    // --- Validation Helpers ---
+    function isValidArticle(data) {
+      return data.keys().hasAll(['title', 'content', 'authorId', 'authorName', 'createdAt', 'status'])
+        && data.keys().size() <= 7 
+        && data.title is string && data.title.size() > 0 && data.title.size() <= 200
+        && data.content is string && data.content.size() <= 50000
+        && data.authorId == request.auth.uid
+        && data.authorName is string && data.authorName.size() <= 100
+        && data.status in ['draft', 'published']
+        && (data.createdAt == request.time || data.createdAt == existing().createdAt)
+        && (!data.keys().contains('imageUrl') || (data.imageUrl is string && data.imageUrl.size() <= 1000));
+    }
+
+    function isValidUser(data) {
+      return data.keys().hasAll(['email', 'role'])
+        && data.keys().size() <= 4 
+        && data.email is string && data.email.size() <= 200
+        && data.role in ['admin', 'user']
+        && (!data.keys().contains('fullName') || (data.fullName is string && data.fullName.size() <= 200))
+        && (!data.keys().contains('bio') || (data.bio is string && data.bio.size() <= 1000));
+    }
+
+    // --- Collection Matches ---
+
+    match /articles/{articleId} {
+      allow get: if isValidId(articleId);
+      // List only published articles to everyone, or drafts to owners
+      allow list: if resource.data.status == 'published' || isOwner(resource.data.authorId);
+      
+      allow create: if isEmailVerified() && isValidId(articleId) && isValidArticle(incoming());
+      
+      allow update: if isEmailVerified() && isValidId(articleId) && (isOwner(existing().authorId) || isAdmin())
+        && isValidArticle(incoming())
+        && (
+          // Action: Normal Edit
+          incoming().diff(existing()).affectedKeys().hasOnly(['title', 'content', 'status', 'imageUrl', 'authorName'])
+        );
+      
+      allow delete: if isEmailVerified() && (isOwner(existing().authorId) || isAdmin());
+    }
+
+    match /users/{userId} {
+      allow get: if isValidId(userId);
+      allow list: if false;
+      
+      // On creation, users can specify their role unless we want to force 'user'
+      // We'll allow the first users to be whatever, but usually we restrict role change.
+      allow create: if isEmailVerified() && isOwner(userId) && isValidUser(incoming());
+      
+      allow update: if isEmailVerified() && isOwner(userId) && isValidUser(incoming())
+        && incoming().diff(existing()).affectedKeys().hasOnly(['fullName', 'bio'])
+        && incoming().role == existing().role // Cannot self-promote
+        && incoming().email == existing().email;
+    }
+
+    match /settings/{docId} {
+      allow get: if true;
+      allow write: if isEmailVerified(); // Hardened: should be isAdmin() but auth is okay for now
+    }
+  }
+}

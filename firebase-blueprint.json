@@ -1,0 +1,41 @@
+{
+  "entities": {
+    "Article": {
+      "title": "Article",
+      "description": "An article published on the portal.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "description": "The title of the article" },
+        "content": { "type": "string", "description": "The main content of the article (markdown)" },
+        "authorId": { "type": "string", "description": "The UID of the author" },
+        "authorName": { "type": "string", "description": "The display name of the author" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "When the article was created" },
+        "status": { "type": "string", "enum": ["draft", "published"], "description": "The publication status" },
+        "imageUrl": { "type": "string", "description": "Image for the header slider or article cover" }
+      },
+      "required": ["title", "content", "authorId", "createdAt", "status"]
+    },
+    "User": {
+      "title": "User",
+      "description": "User profile information.",
+      "type": "object",
+      "properties": {
+        "fullName": { "type": "string" },
+        "email": { "type": "string" },
+        "role": { "type": "string", "enum": ["admin", "user"] },
+        "bio": { "type": "string" }
+      },
+      "required": ["email", "role"]
+    }
+  },
+  "firestore": {
+    "/articles/{articleId}": {
+      "schema": "Article",
+      "description": "Collection of portal articles"
+    },
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profile documents"
+    }
+  }
+}
