@@ -29,7 +29,8 @@ function getAI() {
 export async function generateArticleDraft(topic: string) {
   try {
     const ai = getAI();
-    const model = ai.getGenerativeModel({ model: "gemini-1.5-flash" });
+    // Force v1 API version to avoid issues with v1beta not finding the model
+    const model = ai.getGenerativeModel({ model: "gemini-1.5-flash" }, { apiVersion: 'v1' });
     
     const result = await model.generateContent(`Write a helpful article about: ${topic}. Format it in professional Indonesian markdown. Include a catchy title and structured body content.`);
     return result.response.text();
@@ -42,7 +43,7 @@ export async function generateArticleDraft(topic: string) {
 export async function refineContent(content: string, instruction: string) {
   try {
     const ai = getAI();
-    const model = ai.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = ai.getGenerativeModel({ model: "gemini-1.5-flash" }, { apiVersion: 'v1' });
 
     const result = await model.generateContent(`Refine the following Indonesian content based on this instruction: "${instruction}". \n\nContent:\n${content}`);
     return result.response.text();
