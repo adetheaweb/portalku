@@ -4,9 +4,11 @@ let genAI: GoogleGenAI | null = null;
 
 function getAI() {
   if (!genAI) {
-    const apiKey = process.env.GEMINI_API_KEY;
+    // Check both standard env (AI Studio) and VITE_ env (Vercel/Vite)
+    const apiKey = process.env.GEMINI_API_KEY || (import.meta as any).env?.VITE_GEMINI_API_KEY;
+    
     if (!apiKey) {
-      throw new Error("GEMINI_API_KEY is not defined. Please check your environment variables.");
+      throw new Error("GEMINI_API_KEY (atau VITE_GEMINI_API_KEY) tidak ditemukan. Pastikan sudah diatur di Settings atau Environment Variables Vercel.");
     }
     genAI = new GoogleGenAI({ apiKey });
   }
