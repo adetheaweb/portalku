@@ -17,7 +17,7 @@ export async function generateArticleDraft(topic: string) {
   try {
     const ai = getAI();
     const response = await ai.models.generateContent({
-      model: "gemini-3-flash-preview",
+      model: "gemini-1.5-flash",
       contents: `Write a helpful article about: ${topic}. Format it in professional Indonesian markdown. Include a catchy title and structured body content.`,
     });
     return response.text;
@@ -31,7 +31,7 @@ export async function refineContent(content: string, instruction: string) {
   try {
     const ai = getAI();
     const response = await ai.models.generateContent({
-      model: "gemini-3-flash-preview",
+      model: "gemini-1.5-flash",
       contents: `Refine the following Indonesian content based on this instruction: "${instruction}". \n\nContent:\n${content}`,
     });
     return response.text;

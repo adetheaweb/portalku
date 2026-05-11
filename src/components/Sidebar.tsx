@@ -21,9 +21,13 @@ interface SidebarProps {
 export default function Sidebar({ currentView, onNavigate, user }: SidebarProps) {
   const handleLogin = async () => {
     try {
-      await signInWithPopup(auth, new GoogleAuthProvider());
-    } catch (error) {
-      console.error(error);
+      const provider = new GoogleAuthProvider();
+      // Force account selection to avoid ghost logins
+      provider.setCustomParameters({ prompt: 'select_account' });
+      await signInWithPopup(auth, provider);
+    } catch (error: any) {
+      console.error("Login detail error:", error);
+      alert(`Login Gagal: ${error.message || 'Cek koneksi atau pengaturan Firebase.'}`);
     }
   };
 
@@ -42,8 +46,11 @@ export default function Sidebar({ currentView, onNavigate, user }: SidebarProps)
     <div className="w-full bg-white flex flex-col h-full">
       <div className="p-8 flex-1 space-y-8">
         <div className="flex items-center gap-3 mb-8 px-2">
-          <div className="w-10 h-10 bg-gray-900 rounded-full flex items-center justify-center text-white border-2 border-gray-100 shadow-md">
-            <span className="font-black text-sm tracking-tighter">ADE</span>
+          <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center border-2 border-gray-100 shadow-sm overflow-hidden">
+            <svg viewBox="0 0 100 100" className="w-8 h-8">
+              <text x="5" y="82" fontFamily="Arial, sans-serif" fontWeight="900" fontStyle="italic" fontSize="85" fill="black">A</text>
+              <path d="M5 75 Q 35 35 95 30" stroke="#ef4444" strokeWidth="12" fill="none" strokeLinecap="round" />
+            </svg>
           </div>
           <div>
             <h2 className="text-sm font-bold text-gray-900 uppercase tracking-widest leading-none">Portal</h2>

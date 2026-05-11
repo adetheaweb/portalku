@@ -95,8 +95,11 @@ export default function HeaderSlider({ settings }: { settings: PortalSettings })
       {/* Brand Header */}
       <div className="absolute top-0 left-0 right-0 h-16 bg-white/5 backdrop-blur-sm border-b border-white/10 z-40 flex items-center justify-between px-8">
         <div className="flex items-center gap-3">
-          <div className={`w-10 h-10 ${accentClasses[settings.primaryColor] || 'bg-indigo-600'} rounded-full flex items-center justify-center text-white border-2 border-white/20 transition-colors shadow-lg overflow-hidden`}>
-            <span className="font-black text-sm tracking-tighter">ADE</span>
+          <div className={`w-10 h-10 bg-white rounded-full flex items-center justify-center border-2 border-white/20 transition-colors shadow-lg overflow-hidden relative`}>
+            <svg viewBox="0 0 100 100" className="w-8 h-8">
+              <text x="5" y="82" fontFamily="Arial, sans-serif" fontWeight="900" fontStyle="italic" fontSize="85" fill="black">A</text>
+              <path d="M5 75 Q 35 35 95 30" stroke="#ef4444" strokeWidth="12" fill="none" strokeLinecap="round" />
+            </svg>
           </div>
           <h1 className="text-xl font-bold text-white tracking-tight">{settings.headerTitle}</h1>
         </div>
