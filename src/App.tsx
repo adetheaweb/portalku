@@ -4,7 +4,6 @@ import Sidebar from './components/Sidebar';
 import Footer from './components/Footer';
 import Dashboard from './pages/Dashboard';
 import InfoKita from './pages/InfoKita';
-import Profile from './pages/Profile';
 import ArticleWrite from './pages/ArticleWrite';
 import Settings from './pages/Settings';
 import { ViewType, PortalSettings } from './types';
@@ -56,7 +55,7 @@ export default function App() {
 
   // Handle access control
   useEffect(() => {
-    if (!loading && !user && (currentView === 'settings' || currentView === 'admin-write' || currentView === 'profile')) {
+    if (!loading && !user && (currentView === 'settings' || currentView === 'admin-write')) {
       setCurrentView('dashboard');
     }
   }, [user, currentView, loading]);
@@ -67,8 +66,6 @@ export default function App() {
         return <Dashboard user={user} onNavigate={setCurrentView} />;
       case 'info-kita':
         return <InfoKita />;
-      case 'profile':
-        return <Profile user={user} />;
       case 'admin-write':
         return <ArticleWrite />;
       case 'settings':

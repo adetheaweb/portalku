@@ -2,7 +2,6 @@ import React from 'react';
 import { 
   LayoutDashboard, 
   Info, 
-  User, 
   PenSquare, 
   LogOut,
   LogIn,
@@ -38,7 +37,6 @@ export default function Sidebar({ currentView, onNavigate, user }: SidebarProps)
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'info-kita', label: 'Info Kita', icon: Info },
-    { id: 'profile', label: 'Profil', icon: User },
     { id: 'settings', label: 'Pengaturan', icon: SettingsIcon },
   ];
 

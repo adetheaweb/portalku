@@ -29,4 +29,4 @@ export interface PortalSettings {
   sliderImages?: string[];
 }
 
-export type ViewType = 'dashboard' | 'info-kita' | 'profile' | 'admin-write' | 'settings';
+export type ViewType = 'dashboard' | 'info-kita' | 'admin-write' | 'settings';
