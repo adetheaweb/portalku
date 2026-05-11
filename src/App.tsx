@@ -25,6 +25,9 @@ export default function App() {
     const unsubAuth = onAuthStateChanged(auth, (u) => {
       setUser(u);
       setLoading(false);
+    }, (error) => {
+      console.error("Auth error:", error);
+      setLoading(false);
     });
 
     const unsubSettings = subscribeToSettings((data) => {
@@ -35,10 +38,6 @@ export default function App() {
           primaryColor: data.primaryColor || 'indigo',
           headerTitle: data.headerTitle || 'Portal_adethea'
         }));
-        // Apply theme color to CSS variable
-        if (data.primaryColor) {
-           document.documentElement.style.setProperty('--primary-color', data.primaryColor);
-        }
       }
     });
 
@@ -47,6 +46,13 @@ export default function App() {
       unsubSettings();
     };
   }, []);
+
+  useEffect(() => {
+    // Only access document if it's available and we have a color
+    if (typeof document !== 'undefined' && portalSettings.primaryColor) {
+      document.documentElement.style.setProperty('--primary-color', portalSettings.primaryColor);
+    }
+  }, [portalSettings.primaryColor]);
 
   // Handle access control
   useEffect(() => {

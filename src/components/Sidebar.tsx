@@ -41,6 +41,15 @@ export default function Sidebar({ currentView, onNavigate, user }: SidebarProps)
   return (
     <div className="w-full bg-white flex flex-col h-full">
       <div className="p-8 flex-1 space-y-8">
+        <div className="flex items-center gap-3 mb-8 px-2">
+          <div className="w-10 h-10 bg-gray-900 rounded-full flex items-center justify-center text-white border-2 border-gray-100 shadow-md">
+            <span className="font-black text-sm tracking-tighter">ADE</span>
+          </div>
+          <div>
+            <h2 className="text-sm font-bold text-gray-900 uppercase tracking-widest leading-none">Portal</h2>
+            <p className="text-[10px] text-gray-400 font-medium">Adethea</p>
+          </div>
+        </div>
         <div>
           <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mb-6">Navigation</h3>
           <nav className="space-y-1">
