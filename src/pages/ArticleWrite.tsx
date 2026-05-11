@@ -73,8 +73,16 @@ export default function ArticleWrite() {
         setTitle(lines[0].replace(/#+\s*/, '') || topic);
         setContent(draft);
       }
-    } catch (err) {
-      alert("Gagal memproses AI");
+    } catch (err: any) {
+      console.error("Gemini Error:", err);
+      // Try to parse if it's a JSON string (could be from handleFirestoreError or similar pattern)
+      let displayMsg = "Gagal memproses AI";
+      try {
+        if (err.message) {
+          displayMsg += `: ${err.message}`;
+        }
+      } catch (e) {}
+      alert(displayMsg);
     } finally {
       setLoading(false);
     }
@@ -86,8 +94,9 @@ export default function ArticleWrite() {
     try {
       const refined = await refineContent(content, refineQuery);
       if (refined) setContent(refined);
-    } catch (err) {
-      alert("Gagal memproses perbaikan");
+    } catch (err: any) {
+      console.error("Gemini Error:", err);
+      alert(`Gagal memproses perbaikan: ${err.message || "Pastikan koneksi internet stabil."}`);
     } finally {
       setLoading(false);
     }

@@ -4,12 +4,23 @@ let genAI: GoogleGenAI | null = null;
 
 function getAI() {
   if (!genAI) {
-    // Check both standard env (AI Studio) and VITE_ env (Vercel/Vite)
-    const apiKey = process.env.GEMINI_API_KEY || (import.meta as any).env?.VITE_GEMINI_API_KEY;
+    let apiKey = '';
+    
+    // Check Vite's import.meta.env first (Standard for Vercel/Vite deployments)
+    if (typeof import.meta !== 'undefined' && import.meta.env) {
+      apiKey = import.meta.env.VITE_GEMINI_API_KEY || '';
+    }
+    
+    // Fallback to process.env (AI Studio Preview environment)
+    if (!apiKey && typeof process !== 'undefined' && process.env) {
+      apiKey = process.env.GEMINI_API_KEY || '';
+    }
     
     if (!apiKey) {
-      throw new Error("GEMINI_API_KEY (atau VITE_GEMINI_API_KEY) tidak ditemukan. Pastikan sudah diatur di Settings atau Environment Variables Vercel.");
+      console.error("Gemini API Key missing!");
+      throw new Error("API Key tidak ditemukan. Pastikan variabel 'VITE_GEMINI_API_KEY' sudah diatur di Environment Variables Vercel, atau 'GEMINI_API_KEY' di Settings AI Studio.");
     }
+    
     genAI = new GoogleGenAI({ apiKey });
   }
   return genAI;
