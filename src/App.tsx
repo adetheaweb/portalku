@@ -29,9 +29,16 @@ export default function App() {
 
     const unsubSettings = subscribeToSettings((data) => {
       if (data) {
-        setPortalSettings(prev => ({ ...prev, ...data }));
-        // Apply theme color to CSS variable or body class if needed
-        document.documentElement.style.setProperty('--primary-color', data.primaryColor);
+        setPortalSettings(prev => ({ 
+          ...prev, 
+          ...data,
+          primaryColor: data.primaryColor || 'indigo',
+          headerTitle: data.headerTitle || 'Portal_adethea'
+        }));
+        // Apply theme color to CSS variable
+        if (data.primaryColor) {
+           document.documentElement.style.setProperty('--primary-color', data.primaryColor);
+        }
       }
     });
 

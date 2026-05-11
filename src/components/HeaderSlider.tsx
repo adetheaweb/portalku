@@ -69,6 +69,8 @@ export default function HeaderSlider({ settings }: { settings: PortalSettings })
     slate: 'text-slate-300',
   };
 
+  const slide = slides[current] || slides[0] || SLIDES[0];
+
   return (
     <header className={`relative w-full h-48 ${themeClasses[settings.primaryColor] || 'bg-indigo-950'} overflow-hidden shrink-0 transition-colors duration-700`}>
       {/* Background Image Layer if set (Static Header Image) */}
@@ -80,13 +82,13 @@ export default function HeaderSlider({ settings }: { settings: PortalSettings })
       )}
 
       {/* Dynamic Slider Image Background */}
-      {slides[current].image && (
+      {slide?.image && (
         <motion.div 
           key={`bg-${current}`}
           initial={{ opacity: 0 }}
           animate={{ opacity: 0.5 }}
           className="absolute inset-0 z-0 bg-cover bg-center mix-blend-overlay"
-          style={{ backgroundImage: `url(${slides[current].image})` }}
+          style={{ backgroundImage: `url(${slide.image})` }}
         />
       )}
 
@@ -130,7 +132,7 @@ export default function HeaderSlider({ settings }: { settings: PortalSettings })
               transition={{ delay: 0.1 }}
               className="text-3xl md:text-4xl font-light text-white leading-tight"
             >
-              {slides[current].title.split(':').map((part, i) => i === 0 ? <span key={i}>{part}</span> : <span key={i} className="font-bold">:{part}</span>)}
+              {slide?.title?.split(':').map((part, i) => i === 0 ? <span key={i}>{part}</span> : <span key={i} className="font-bold">:{part}</span>)}
             </motion.h2>
           </div>
         </motion.div>
