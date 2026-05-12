@@ -29,7 +29,7 @@ service cloud.firestore {
         && data.authorId == request.auth.uid
         && data.authorName is string && data.authorName.size() <= 100
         && data.status in ['draft', 'published']
-        && (data.createdAt == request.time || data.createdAt == existing().createdAt)
+        && (resource == null ? data.createdAt == request.time : data.createdAt == resource.data.createdAt)
         && (!data.keys().contains('imageUrl') || (data.imageUrl is string && data.imageUrl.size() <= 1000));
     }
 
