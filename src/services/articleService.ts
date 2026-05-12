@@ -106,6 +106,17 @@ export async function deleteArticle(id: string) {
   }
 }
 
+export async function getAllArticlesCount() {
+  const path = 'articles';
+  try {
+    const q = query(collection(db, path), where('status', '==', 'published'));
+    const snapshot = await getDocs(q);
+    return snapshot.size;
+  } catch (error) {
+    handleFirestoreError(error, OperationType.GET, path);
+  }
+}
+
 export async function getMyArticles() {
   if (!auth.currentUser) return [];
   const path = 'articles';

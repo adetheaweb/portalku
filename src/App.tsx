@@ -12,7 +12,7 @@ import { onAuthStateChanged, User } from 'firebase/auth';
 import { subscribeToSettings } from './services/settingsService';
 
 export default function App() {
-  const [currentView, setCurrentView] = useState<ViewType>('dashboard');
+  const [currentView, setCurrentView] = useState<ViewType>('info-kita');
   const [editingArticleId, setEditingArticleId] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
