@@ -49,16 +49,16 @@ service cloud.firestore {
       // List only published articles to everyone, or drafts to owners
       allow list: if resource.data.status == 'published' || isOwner(resource.data.authorId);
       
-      allow create: if isEmailVerified() && isValidId(articleId) && isValidArticle(incoming());
+      allow create: if isSignedIn() && isValidId(articleId) && isValidArticle(incoming());
       
-      allow update: if isEmailVerified() && isValidId(articleId) && (isOwner(existing().authorId) || isAdmin())
+      allow update: if isSignedIn() && isValidId(articleId) && (isOwner(existing().authorId) || isAdmin())
         && isValidArticle(incoming())
         && (
           // Action: Normal Edit
           incoming().diff(existing()).affectedKeys().hasOnly(['title', 'content', 'status', 'imageUrl', 'authorName'])
         );
       
-      allow delete: if isEmailVerified() && (isOwner(existing().authorId) || isAdmin());
+      allow delete: if isSignedIn() && (isOwner(existing().authorId) || isAdmin());
     }
 
     match /users/{userId} {
@@ -67,9 +67,9 @@ service cloud.firestore {
       
       // On creation, users can specify their role unless we want to force 'user'
       // We'll allow the first users to be whatever, but usually we restrict role change.
-      allow create: if isEmailVerified() && isOwner(userId) && isValidUser(incoming());
+      allow create: if isSignedIn() && isOwner(userId) && isValidUser(incoming());
       
-      allow update: if isEmailVerified() && isOwner(userId) && isValidUser(incoming())
+      allow update: if isSignedIn() && isOwner(userId) && isValidUser(incoming())
         && incoming().diff(existing()).affectedKeys().hasOnly(['fullName', 'bio'])
         && incoming().role == existing().role // Cannot self-promote
         && incoming().email == existing().email;
@@ -77,7 +77,7 @@ service cloud.firestore {
 
     match /settings/{docId} {
       allow get: if true;
-      allow write: if isEmailVerified(); // Hardened: should be isAdmin() but auth is okay for now
+      allow write: if isSignedIn(); // Hardened: should be isAdmin() but auth is okay for now
     }
   }
 }

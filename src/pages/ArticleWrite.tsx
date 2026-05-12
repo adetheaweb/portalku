@@ -115,9 +115,18 @@ export default function ArticleWrite() {
       setTitle('');
       setContent('');
       setTopic('');
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      alert("Gagal menyimpan artikel");
+      let displayMsg = "Gagal menyimpan artikel";
+      try {
+        const errorData = JSON.parse(err.message);
+        if (errorData.error) {
+          displayMsg += `: ${errorData.error}`;
+        }
+      } catch (e) {
+        if (err.message) displayMsg += `: ${err.message}`;
+      }
+      alert(displayMsg);
     } finally {
       setIsPublishing(false);
     }
