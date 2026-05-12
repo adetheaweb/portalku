@@ -16,7 +16,7 @@ export default function Settings({ user }: { user: any }) {
     primaryColor: 'indigo',
     headerTitle: 'Portal_adethea',
     headerImageUrl: '',
-    sliderImages: []
+    slides: []
   });
   const [loading, setLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -26,10 +26,16 @@ export default function Settings({ user }: { user: any }) {
     const fetch = async () => {
       const data = await getPortalSettings();
       if (data) {
+        // Migrate sliderImages to slides if slides are empty
+        let initialSlides = data.slides || [];
+        if (initialSlides.length === 0 && data.sliderImages && data.sliderImages.length > 0) {
+          initialSlides = data.sliderImages.map(img => ({ imageUrl: img, title: 'Custom Slide', description: '' }));
+        }
+
         setSettings(prev => ({ 
           ...prev, 
           ...data,
-          sliderImages: data.sliderImages || []
+          slides: initialSlides
         }));
       }
       setLoading(false);
@@ -41,7 +47,7 @@ export default function Settings({ user }: { user: any }) {
     if (!newImageUrl) return;
     setSettings({
       ...settings,
-      sliderImages: [...(settings.sliderImages || []), newImageUrl]
+      slides: [...(settings.slides || []), { imageUrl: newImageUrl, title: 'Slide Baru', description: '' }]
     });
     setNewImageUrl('');
   };
@@ -49,8 +55,14 @@ export default function Settings({ user }: { user: any }) {
   const handleRemoveImage = (index: number) => {
     setSettings({
       ...settings,
-      sliderImages: (settings.sliderImages || []).filter((_, i) => i !== index)
+      slides: (settings.slides || []).filter((_, i) => i !== index)
     });
+  };
+
+  const handleSlideChange = (index: number, field: string, value: string) => {
+    const newSlides = [...(settings.slides || [])];
+    newSlides[index] = { ...newSlides[index], [field]: value };
+    setSettings({ ...settings, slides: newSlides });
   };
 
   const handleSave = async () => {
@@ -116,7 +128,7 @@ export default function Settings({ user }: { user: any }) {
                         reader.onloadend = () => {
                           setSettings({
                             ...settings,
-                            sliderImages: [...(settings.sliderImages || []), reader.result as string]
+                            slides: [...(settings.slides || []), { imageUrl: reader.result as string, title: 'Upload Baru', description: '' }]
                           });
                         };
                         reader.readAsDataURL(file);
@@ -133,20 +145,39 @@ export default function Settings({ user }: { user: any }) {
               </button>
             </div>
             
-            <div className="grid grid-cols-2 gap-4 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
-              {settings.sliderImages?.map((img, idx) => (
-                <div key={idx} className="relative group aspect-video bg-gray-100 rounded-sm overflow-hidden border border-gray-200">
-                  <img src={img} alt={`Slide ${idx + 1}`} className="w-full h-full object-cover" />
+            <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
+              {settings.slides?.map((slide, idx) => (
+                <div key={idx} className="bg-gray-50 border border-gray-200 rounded-sm p-4 space-y-4 relative group">
+                  <div className="flex gap-4">
+                    <div className="w-24 h-16 shrink-0 bg-gray-200 rounded-sm overflow-hidden border border-gray-300">
+                      <img src={slide.imageUrl} alt={`Slide ${idx + 1}`} className="w-full h-full object-cover" />
+                    </div>
+                    <div className="flex-1 space-y-2">
+                       <input 
+                         type="text"
+                         value={slide.title || ''}
+                         onChange={(e) => handleSlideChange(idx, 'title', e.target.value)}
+                         className="w-full bg-white border border-gray-200 rounded-sm px-3 py-1 text-[11px] font-bold uppercase tracking-tight focus:ring-1 focus:ring-indigo-500 outline-none"
+                         placeholder="Judul Slide"
+                       />
+                       <textarea 
+                         value={slide.description || ''}
+                         onChange={(e) => handleSlideChange(idx, 'description', e.target.value)}
+                         className="w-full bg-white border border-gray-200 rounded-sm px-3 py-1 text-[10px] focus:ring-1 focus:ring-indigo-500 outline-none h-12 resize-none"
+                         placeholder="Keterangan Slide..."
+                       />
+                    </div>
+                  </div>
                   <button 
                     onClick={() => handleRemoveImage(idx)}
-                    className="absolute top-2 right-2 p-1 bg-red-600 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+                    className="absolute -top-2 -right-2 p-1.5 bg-red-600 text-white rounded-full shadow-lg hover:bg-red-700 transition-colors"
                   >
                     <CheckCircle2 className="w-3 h-3 rotate-45" />
                   </button>
                 </div>
               ))}
-              {(!settings.sliderImages || settings.sliderImages.length === 0) && (
-                <div className="col-span-2 py-8 text-center text-gray-400 text-xs italic border-2 border-dashed border-gray-100">
+              {(!settings.slides || settings.slides.length === 0) && (
+                <div className="py-8 text-center text-gray-400 text-xs italic border-2 border-dashed border-gray-100">
                   Belum ada gambar slider kustom.
                 </div>
               )}

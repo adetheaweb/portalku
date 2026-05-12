@@ -26,6 +26,27 @@
         "bio": { "type": "string" }
       },
       "required": ["email", "role"]
+    },
+    "PortalSettings": {
+      "title": "Portal Settings",
+      "description": "Branding and visual settings for the portal.",
+      "type": "object",
+      "properties": {
+        "primaryColor": { "type": "string" },
+        "headerTitle": { "type": "string" },
+        "headerImageUrl": { "type": "string" },
+        "slides": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "imageUrl": { "type": "string" },
+              "title": { "type": "string" },
+              "description": { "type": "string" }
+            }
+          }
+        }
+      }
     }
   },
   "firestore": {
@@ -36,6 +57,10 @@
     "/users/{userId}": {
       "schema": "User",
       "description": "User profile documents"
+    },
+    "/settings/{settingId}": {
+      "schema": "PortalSettings",
+      "description": "Global application settings"
     }
   }
 }

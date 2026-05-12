@@ -27,11 +27,11 @@ const SLIDES = [
 export default function HeaderSlider({ settings }: { settings: PortalSettings }) {
   const [current, setCurrent] = useState(0);
 
-  const slides = settings.sliderImages && settings.sliderImages.length > 0 
-    ? settings.sliderImages.map((img, i) => ({
-        title: `Slide ${i + 1}: Custom Visual`,
-        description: 'Dynamic asset from portal settings.',
-        image: img
+  const slides = settings.slides && settings.slides.length > 0 
+    ? settings.slides.map((s, i) => ({
+        title: s.title || `Slide ${i + 1}`,
+        description: s.description || 'Modern digital portal experience.',
+        image: s.imageUrl
       }))
     : SLIDES;
 
@@ -135,10 +135,18 @@ export default function HeaderSlider({ settings }: { settings: PortalSettings })
               initial={{ y: 10, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.1 }}
-              className="text-2xl md:text-4xl font-light text-white leading-tight"
+              className="text-2xl md:text-3xl font-light text-white leading-tight mb-2"
             >
               {slide?.title?.split(':').map((part, i) => i === 0 ? <span key={i}>{part}</span> : <span key={i} className="font-bold">:{part}</span>)}
             </motion.h2>
+            <motion.p
+              initial={{ y: 10, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.2 }}
+              className="text-[10px] md:text-xs text-white/70 max-w-xl line-clamp-2"
+            >
+              {slide?.description}
+            </motion.p>
           </div>
         </motion.div>
       </AnimatePresence>

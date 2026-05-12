@@ -22,11 +22,18 @@ export interface UserProfile {
   bio?: string;
 }
 
+export interface SliderSlide {
+  imageUrl: string;
+  title?: string;
+  description?: string;
+}
+
 export interface PortalSettings {
   primaryColor: string;
   headerImageUrl?: string;
   headerTitle: string;
-  sliderImages?: string[];
+  sliderImages?: string[]; // Keep for compatibility if needed, but we'll prefer slides
+  slides?: SliderSlide[];
 }
 
 export type ViewType = 'dashboard' | 'info-kita' | 'admin-write' | 'settings';
