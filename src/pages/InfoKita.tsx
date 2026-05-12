@@ -1,15 +1,18 @@
 import React, { useEffect, useState } from 'react';
-import { getPublishedArticles } from '../services/articleService';
+import { getPublishedArticles, deleteArticle } from '../services/articleService';
 import { Article } from '../types';
 import ReactMarkdown from 'react-markdown';
 import rehypeRaw from 'rehype-raw';
-import { Clock, User as UserIcon, BookOpen, ArrowRight } from 'lucide-react';
+import { Clock, User as UserIcon, BookOpen, ArrowRight, Edit3, Trash2 } from 'lucide-react';
 import { motion } from 'motion/react';
+import { auth } from '../lib/firebase';
 
-export default function InfoKita() {
+export default function InfoKita({ onEdit, onNavigate }: { onEdit?: (id: string) => void, onNavigate?: (v: any) => void }) {
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
+
+  const currentUser = auth.currentUser;
 
   useEffect(() => {
     const fetch = async () => {
@@ -24,6 +27,19 @@ export default function InfoKita() {
     };
     fetch();
   }, []);
+
+  const handleDelete = async (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!window.confirm("Hapus artikel ini?")) return;
+    try {
+      await deleteArticle(id);
+      setArticles(prev => prev.filter(a => a.id !== id));
+      if (selectedArticle?.id === id) setSelectedArticle(null);
+    } catch (err) {
+      alert("Gagal menghapus artikel");
+      console.error(err);
+    }
+  };
 
   if (loading) return (
     <div className="flex items-center justify-center h-64">
@@ -59,6 +75,23 @@ export default function InfoKita() {
               <Clock className="w-3 h-3 text-indigo-400" /> {selectedArticle.createdAt?.toDate?.()?.toLocaleDateString?.() || 'Freshly Baked'}
             </span>
             <span className="bg-indigo-600 text-white px-2 py-0.5 rounded-sm">Artikel</span>
+            
+            {(currentUser?.uid === selectedArticle.authorId) && (
+              <div className="flex gap-4 ml-auto">
+                <button 
+                  onClick={() => onEdit?.(selectedArticle.id)}
+                  className="flex items-center gap-2 text-indigo-600 hover:text-indigo-800 transition-colors"
+                >
+                  <Edit3 className="w-3 h-3" /> Edit
+                </button>
+                <button 
+                  onClick={(e) => handleDelete(selectedArticle.id, e)}
+                  className="flex items-center gap-2 text-rose-600 hover:text-rose-800 transition-colors"
+                >
+                  <Trash2 className="w-3 h-3" /> Hapus
+                </button>
+              </div>
+            )}
           </div>
 
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-12 leading-[1.1] tracking-tight">{selectedArticle.title}</h1>
@@ -91,6 +124,23 @@ export default function InfoKita() {
                 <span className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-300 group-hover:bg-indigo-600 group-hover:text-white transition-all">
                   <ArrowRight className="w-4 h-4" />
                 </span>
+                
+                {(currentUser?.uid === article.authorId) && (
+                  <div className="flex gap-2 ml-4">
+                    <button 
+                      onClick={(e) => { e.stopPropagation(); onEdit?.(article.id); }}
+                      className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-all"
+                    >
+                      <Edit3 className="w-4 h-4" />
+                    </button>
+                    <button 
+                      onClick={(e) => handleDelete(article.id, e)}
+                      className="p-2 text-gray-400 hover:text-rose-600 hover:bg-rose-50 rounded-full transition-all"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                )}
               </div>
             </motion.div>
           )) : (

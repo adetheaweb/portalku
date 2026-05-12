@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { getMyArticles } from '../services/articleService';
+import { getMyArticles, deleteArticle } from '../services/articleService';
 import { Article } from '../types';
-import { LayoutDashboard, FileText, CheckCircle, Clock, ArrowRight } from 'lucide-react';
+import { LayoutDashboard, FileText, CheckCircle, Clock, ArrowRight, Edit3, Trash2 } from 'lucide-react';
 import { motion } from 'motion/react';
 
-export default function Dashboard({ user, onNavigate }: { user: any, onNavigate: (v: any) => void }) {
+export default function Dashboard({ user, onNavigate, onEdit }: { user: any, onNavigate: (v: any) => void, onEdit?: (id: string) => void }) {
   const [stats, setStats] = useState({ total: 0, published: 0, draft: 0 });
   const [recent, setRecent] = useState<Article[]>([]);
 
@@ -24,6 +24,18 @@ export default function Dashboard({ user, onNavigate }: { user: any, onNavigate:
       fetch();
     }
   }, [user]);
+
+  const handleDelete = async (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!window.confirm("Hapus artikel ini?")) return;
+    try {
+      await deleteArticle(id);
+      setRecent(prev => prev.filter(a => a.id !== id));
+      setStats(prev => ({ ...prev, total: prev.total - 1 }));
+    } catch (err) {
+      alert("Gagal menghapus artikel");
+    }
+  };
 
   if (!user) return (
     <div className="flex flex-col items-center justify-center h-64 bg-white rounded-3xl border border-gray-100 p-8 shadow-sm text-center gap-4">
@@ -58,16 +70,28 @@ export default function Dashboard({ user, onNavigate }: { user: any, onNavigate:
           </div>
           <div className="space-y-6">
             {recent.length > 0 ? recent.map((article) => (
-              <div key={article.id} className="group cursor-pointer">
+              <div key={article.id} className="group cursor-pointer p-4 hover:bg-gray-50 border border-transparent hover:border-gray-100 rounded-sm transition-all" onClick={() => onEdit?.(article.id)}>
                 <div className="flex justify-between items-start mb-2">
-                  <p className="font-bold text-gray-900 group-hover:text-indigo-600 transition-colors uppercase tracking-tight text-sm">{article.title}</p>
-                  <span className={`text-[8px] font-bold px-2 py-0.5 rounded-sm uppercase tracking-widest ${article.status === 'published' ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-400'}`}>
-                    {article.status}
-                  </span>
+                  <p className="font-bold text-gray-900 group-hover:text-indigo-600 transition-colors uppercase tracking-tight text-sm flex-1 mr-4">{article.title}</p>
+                  <div className="flex items-center gap-2">
+                    <span className={`text-[8px] font-bold px-2 py-0.5 rounded-sm uppercase tracking-widest ${article.status === 'published' ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-400'}`}>
+                      {article.status}
+                    </span>
+                    <button 
+                      onClick={(e) => handleDelete(article.id, e)}
+                      className="p-1.5 text-gray-300 hover:text-rose-600 transition-colors"
+                      title="Hapus"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </div>
-                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-                  Updated: {article.createdAt?.toDate?.()?.toLocaleDateString?.() || 'Recent'}
-                </p>
+                <div className="flex justify-between items-center">
+                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                    Updated: {article.createdAt?.toDate?.()?.toLocaleDateString?.() || 'Recent'}
+                  </p>
+                  <Edit3 className="w-3.5 h-3.5 text-gray-200 group-hover:text-indigo-600 transition-colors" />
+                </div>
               </div>
             )) : (
               <p className="text-center py-12 text-gray-300 text-xs uppercase font-bold tracking-widest">No Recent Activity</p>

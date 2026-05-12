@@ -70,6 +70,42 @@ export async function getPublishedArticles() {
   }
 }
 
+export async function getArticleById(id: string) {
+  const path = `articles/${id}`;
+  try {
+    const snapshot = await getDocs(query(collection(db, 'articles'), where('__name__', '==', id)));
+    if (snapshot.empty) return null;
+    return { id: snapshot.docs[0].id, ...snapshot.docs[0].data() } as Article;
+  } catch (error) {
+    handleFirestoreError(error, OperationType.GET, path);
+  }
+}
+
+export async function updateArticle(id: string, article: Partial<Article>) {
+  if (!auth.currentUser) throw new Error("Must be logged in");
+  const path = `articles/${id}`;
+  try {
+    const docRef = doc(db, 'articles', id);
+    await updateDoc(docRef, {
+      ...article,
+      updatedAt: serverTimestamp(),
+    });
+  } catch (error) {
+    handleFirestoreError(error, OperationType.UPDATE, path);
+  }
+}
+
+export async function deleteArticle(id: string) {
+  if (!auth.currentUser) throw new Error("Must be logged in");
+  const path = `articles/${id}`;
+  try {
+    const docRef = doc(db, 'articles', id);
+    await deleteDoc(docRef);
+  } catch (error) {
+    handleFirestoreError(error, OperationType.DELETE, path);
+  }
+}
+
 export async function getMyArticles() {
   if (!auth.currentUser) return [];
   const path = 'articles';

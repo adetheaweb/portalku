@@ -18,11 +18,12 @@ import {
   AlignJustify
 } from 'lucide-react';
 import { generateArticleDraft, refineContent } from '../services/geminiService';
-import { createArticle } from '../services/articleService';
+import { createArticle, getArticleById, updateArticle } from '../services/articleService';
 import ReactMarkdown from 'react-markdown';
 import rehypeRaw from 'rehype-raw';
+import { Article } from '../types';
 
-export default function ArticleWrite() {
+export default function ArticleWrite({ articleId, onNavigate }: { articleId?: string, onNavigate?: (v: any) => void }) {
   const [topic, setTopic] = useState('');
   const [content, setContent] = useState('');
   const [title, setTitle] = useState('');
@@ -32,6 +33,26 @@ export default function ArticleWrite() {
   const [fontSize, setFontSize] = useState('text-sm');
   
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  React.useEffect(() => {
+    if (articleId) {
+      const fetchArticle = async () => {
+        setLoading(true);
+        try {
+          const art = await getArticleById(articleId);
+          if (art) {
+            setTitle(art.title);
+            setContent(art.content);
+          }
+        } catch (err) {
+          console.error(err);
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchArticle();
+    }
+  }, [articleId]);
 
   const insertMarkdown = (before: string, after: string = '') => {
     if (!textareaRef.current) return;
@@ -106,15 +127,27 @@ export default function ArticleWrite() {
     if (!title || !content) return;
     setIsPublishing(true);
     try {
-      await createArticle({
-        title,
-        content,
-        status,
-      });
+      if (articleId) {
+        await updateArticle(articleId, {
+          title,
+          content,
+          status,
+        });
+      } else {
+        await createArticle({
+          title,
+          content,
+          status,
+        });
+      }
       alert(status === 'published' ? "Artikel berhasil dipublikasikan!" : "Simpan draf berhasil");
-      setTitle('');
-      setContent('');
-      setTopic('');
+      if (onNavigate) {
+        onNavigate('info-kita');
+      } else {
+        setTitle('');
+        setContent('');
+        setTopic('');
+      }
     } catch (err: any) {
       console.error(err);
       let displayMsg = "Gagal menyimpan artikel";
@@ -136,16 +169,24 @@ export default function ArticleWrite() {
     <div className="space-y-8 animate-in fade-in duration-500 max-w-full">
       <div className="flex justify-between items-end pb-6 border-b border-gray-200">
         <div>
-          <h2 className="text-2xl font-bold text-gray-800">Admin Info Kita</h2>
-          <p className="text-gray-500 text-sm mt-1">Tulis artikel cerdas dengan bantuan kecerdasan buatan.</p>
+          <h2 className="text-2xl font-bold text-gray-800">{articleId ? 'Edit Artikel' : 'Admin Info Kita'}</h2>
+          <p className="text-gray-500 text-sm mt-1">{articleId ? 'Perbarui konten artikel Anda.' : 'Tulis artikel cerdas dengan bantuan kecerdasan buatan.'}</p>
         </div>
         <div className="flex gap-2">
+          {onNavigate && (
+            <button 
+              onClick={() => onNavigate('dashboard')}
+              className="px-6 py-2.5 rounded-sm font-bold text-xs uppercase tracking-widest text-gray-500 hover:bg-gray-100 transition-all border border-gray-200"
+            >
+              Batal
+            </button>
+          )}
           <button 
             disabled={isPublishing || !content}
             onClick={() => handleSave('published')}
             className="bg-current text-white px-8 py-2.5 rounded-sm font-bold text-xs uppercase tracking-widest shadow-lg hover:opacity-90 disabled:opacity-50 transition-all"
           >
-            {isPublishing ? 'Publishing...' : 'Publish Artikel'}
+            {isPublishing ? 'Publishing...' : articleId ? 'Update Artikel' : 'Publish Artikel'}
           </button>
         </div>
       </div>

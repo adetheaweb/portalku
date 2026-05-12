@@ -13,6 +13,7 @@ import { subscribeToSettings } from './services/settingsService';
 
 export default function App() {
   const [currentView, setCurrentView] = useState<ViewType>('dashboard');
+  const [editingArticleId, setEditingArticleId] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [portalSettings, setPortalSettings] = useState<PortalSettings>({
@@ -60,18 +61,28 @@ export default function App() {
     }
   }, [user, currentView, loading]);
 
+  const handleNavigateEdit = (id: string) => {
+    setEditingArticleId(id);
+    setCurrentView('admin-write');
+  };
+
+  const handleNavigateNew = () => {
+    setEditingArticleId(null);
+    setCurrentView('admin-write');
+  };
+
   const renderContent = () => {
     switch (currentView) {
       case 'dashboard':
-        return <Dashboard user={user} onNavigate={setCurrentView} />;
+        return <Dashboard user={user} onNavigate={(v) => v === 'admin-write' ? handleNavigateNew() : setCurrentView(v)} onEdit={handleNavigateEdit} />;
       case 'info-kita':
-        return <InfoKita />;
+        return <InfoKita onEdit={handleNavigateEdit} onNavigate={setCurrentView} />;
       case 'admin-write':
-        return <ArticleWrite />;
+        return <ArticleWrite articleId={editingArticleId || undefined} onNavigate={setCurrentView} />;
       case 'settings':
         return <Settings user={user} />;
       default:
-        return <Dashboard user={user} onNavigate={setCurrentView} />;
+        return <Dashboard user={user} onNavigate={setCurrentView} onEdit={handleNavigateEdit} />;
     }
   };
 
@@ -98,7 +109,7 @@ export default function App() {
           <aside className="w-72 bg-white border-r border-gray-200 flex flex-col shrink-0 overflow-y-auto">
             <Sidebar 
               currentView={currentView} 
-              onNavigate={setCurrentView} 
+              onNavigate={(v) => v === 'admin-write' ? handleNavigateNew() : setCurrentView(v)} 
               user={user} 
             />
           </aside>
