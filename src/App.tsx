@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import HeaderSlider from './components/HeaderSlider';
 import Sidebar from './components/Sidebar';
+import MobileNav from './components/MobileNav';
 import Footer from './components/Footer';
 import Dashboard from './pages/Dashboard';
 import InfoKita from './pages/InfoKita';
@@ -104,9 +105,9 @@ export default function App() {
       <HeaderSlider settings={portalSettings} />
       
       <main className="flex-1 flex overflow-hidden">
-        <div className="flex w-full overflow-hidden">
-          {/* Column 1: Side / Stats Column */}
-          <aside className="w-72 bg-white border-r border-gray-200 flex flex-col shrink-0 overflow-y-auto">
+        <div className="flex w-full overflow-hidden relative">
+          {/* Column 1: Side / Stats Column - Hidden on mobile */}
+          <aside className="hidden lg:flex w-72 bg-white border-r border-gray-200 flex-col shrink-0 overflow-y-auto">
             <Sidebar 
               currentView={currentView} 
               onNavigate={(v) => v === 'admin-write' ? handleNavigateNew() : setCurrentView(v)} 
@@ -115,11 +116,18 @@ export default function App() {
           </aside>
 
           {/* Column 2: Main Workspace */}
-          <section className="flex-1 overflow-y-auto p-8 lg:p-12">
+          <section className="flex-1 overflow-y-auto p-4 md:p-8 lg:p-12 pb-24 lg:pb-12">
             <div className="max-w-6xl mx-auto">
               {renderContent()}
             </div>
           </section>
+
+          {/* Mobile Bottom Nav */}
+          <MobileNav 
+            currentView={currentView}
+            onNavigate={(v) => v === 'admin-write' ? handleNavigateNew() : setCurrentView(v)}
+            user={user}
+          />
         </div>
       </main>
 

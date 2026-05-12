@@ -104,7 +104,9 @@ export default function Sidebar({ currentView, onNavigate, user }: SidebarProps)
                 />
               </div>
               <div className="overflow-hidden">
-                <p className="text-xs font-bold text-gray-900 truncate uppercase tracking-tight">{user.displayName}</p>
+                <p className="text-xs font-bold text-gray-900 truncate uppercase tracking-tight">
+                  {user.displayName?.toLowerCase().includes('ade ruhiyat') ? 'Adethea' : user.displayName}
+                </p>
                 <p className="text-[10px] text-gray-400 truncate">{user.email}</p>
               </div>
             </div>

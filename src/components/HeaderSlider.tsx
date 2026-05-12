@@ -93,7 +93,7 @@ export default function HeaderSlider({ settings }: { settings: PortalSettings })
       )}
 
       {/* Brand Header */}
-      <div className="absolute top-0 left-0 right-0 h-16 bg-white/5 backdrop-blur-sm border-b border-white/10 z-40 flex items-center justify-between px-8">
+      <div className="absolute top-0 left-0 right-0 h-16 bg-white/5 backdrop-blur-sm border-b border-white/10 z-40 flex items-center justify-between px-4 md:px-8">
         <div className="flex items-center gap-3">
           <div className={`w-10 h-10 bg-white rounded-full flex items-center justify-center border-2 border-white/20 transition-colors shadow-lg overflow-hidden relative`}>
             <svg viewBox="0 0 100 100" className="w-8 h-8">
@@ -116,10 +116,10 @@ export default function HeaderSlider({ settings }: { settings: PortalSettings })
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.8 }}
-          className="absolute inset-0 flex flex-col justify-end pb-8 px-12 md:px-24"
+          className="absolute inset-0 flex flex-col justify-end pb-8 px-6 md:px-24"
         >
           {/* Geometric Accent */}
-          <div className="absolute right-0 top-0 w-1/2 h-full opacity-10 flex items-center justify-center overflow-hidden pointer-events-none">
+          <div className="absolute right-0 top-0 w-1/2 h-full opacity-10 flex items-center justify-center overflow-hidden pointer-events-none hidden md:flex">
             <div className="w-[600px] h-[600px] border-[40px] border-white rotate-45 rounded-[80px]"></div>
           </div>
 
@@ -127,7 +127,7 @@ export default function HeaderSlider({ settings }: { settings: PortalSettings })
             <motion.span 
               initial={{ y: 10, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              className={`text-xs font-bold uppercase tracking-widest ${textAccentClasses[settings.primaryColor] || 'text-indigo-300'} mb-2 block`}
+              className={`text-[10px] md:text-xs font-bold uppercase tracking-widest ${textAccentClasses[settings.primaryColor] || 'text-indigo-300'} mb-2 block`}
             >
               Featured Insight
             </motion.span>
@@ -135,7 +135,7 @@ export default function HeaderSlider({ settings }: { settings: PortalSettings })
               initial={{ y: 10, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.1 }}
-              className="text-3xl md:text-4xl font-light text-white leading-tight"
+              className="text-2xl md:text-4xl font-light text-white leading-tight"
             >
               {slide?.title?.split(':').map((part, i) => i === 0 ? <span key={i}>{part}</span> : <span key={i} className="font-bold">:{part}</span>)}
             </motion.h2>
@@ -144,7 +144,7 @@ export default function HeaderSlider({ settings }: { settings: PortalSettings })
       </AnimatePresence>
 
       {/* Controls */}
-      <div className="absolute bottom-6 right-12 z-30 flex gap-2">
+      <div className="absolute bottom-6 right-6 md:right-12 z-30 flex gap-2">
         <button 
           onClick={prev}
           className="p-2 border border-white/20 hover:bg-white/10 text-white transition-all rounded-sm"

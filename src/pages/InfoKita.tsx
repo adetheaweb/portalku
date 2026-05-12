@@ -15,6 +15,11 @@ export default function InfoKita({ onEdit, onNavigate }: { onEdit?: (id: string)
 
   const currentUser = auth.currentUser;
 
+  const displayAuthor = (name: string) => {
+    if (!name) return 'Anonymous';
+    return name.toLowerCase().includes('ade ruhiyat') ? 'Adethea' : name;
+  };
+
   useEffect(() => {
     const fetch = async () => {
       try {
@@ -56,31 +61,11 @@ export default function InfoKita({ onEdit, onNavigate }: { onEdit?: (id: string)
   );
 
   return (
-    <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700 text-current">
+    <div className="space-y-8 md:space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700 text-current pb-20">
       {!selectedArticle && (
-        <div className="space-y-10">
-          <div className="pb-8 border-b border-gray-200">
-            <h2 className="text-4xl font-bold text-gray-900 tracking-tight">Info Kita</h2>
-            <p className="text-gray-500 mt-2 text-lg">Update informasi terkurasi dari komunitas digital kami.</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-indigo-600 text-white p-8 rounded-sm shadow-sm flex flex-col justify-between h-40 relative overflow-hidden">
-               <div className="absolute -right-4 -bottom-4 w-32 h-32 bg-white/10 rounded-full blur-3xl"></div>
-               <p className="text-xs font-bold uppercase tracking-[0.2em] opacity-80">Total Pengunjung</p>
-               <div className="flex items-end justify-between relative z-10">
-                 <p className="text-6xl font-bold tracking-tighter">{stats.visitors.toLocaleString()}</p>
-                 <UserIcon className="w-8 h-8 opacity-30" />
-               </div>
-            </div>
-            <div className="bg-white border border-gray-200 p-8 rounded-sm shadow-sm flex flex-col justify-between h-40">
-               <p className="text-xs font-bold uppercase tracking-[0.2em] text-gray-400">Total Artikel Publik</p>
-               <div className="flex items-end justify-between">
-                 <p className="text-6xl font-bold tracking-tighter text-gray-900">{stats.total}</p>
-                 <FileText className="w-8 h-8 text-indigo-600 opacity-20" />
-               </div>
-            </div>
-          </div>
+        <div className="pb-6 md:pb-8 border-b border-gray-200">
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight">Info Kita</h2>
+          <p className="text-gray-500 mt-2 text-base md:text-lg">Update informasi terkurasi dari komunitas digital kami.</p>
         </div>
       )}
 
@@ -88,18 +73,18 @@ export default function InfoKita({ onEdit, onNavigate }: { onEdit?: (id: string)
         <motion.div 
           initial={{ opacity: 0, y: 10 }} 
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white p-8 md:p-16 border border-gray-200 rounded-sm shadow-sm relative"
+          className="bg-white p-6 md:p-8 lg:p-16 border border-gray-200 rounded-sm shadow-sm relative"
         >
           <button 
             onClick={() => setSelectedArticle(null)}
-            className="mb-12 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 hover:text-indigo-600 transition-colors flex items-center gap-2"
+            className="mb-8 md:mb-12 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 hover:text-indigo-600 transition-colors flex items-center gap-2"
           >
             ← Kembali ke daftar
           </button>
           
-          <div className="flex flex-wrap gap-6 items-center text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-8 pb-8 border-b border-gray-100">
+          <div className="flex flex-wrap gap-4 md:gap-6 items-center text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-6 md:mb-8 pb-6 md:pb-8 border-b border-gray-100">
             <span className="flex items-center gap-2">
-              <UserIcon className="w-3 h-3 text-indigo-400" /> {selectedArticle.authorName}
+              <UserIcon className="w-3 h-3 text-indigo-400" /> {displayAuthor(selectedArticle.authorName)}
             </span>
             <span className="flex items-center gap-2">
               <Clock className="w-3 h-3 text-indigo-400" /> {selectedArticle.createdAt?.toDate?.()?.toLocaleDateString?.() || 'Freshly Baked'}
@@ -107,7 +92,7 @@ export default function InfoKita({ onEdit, onNavigate }: { onEdit?: (id: string)
             <span className="bg-indigo-600 text-white px-2 py-0.5 rounded-sm">Artikel</span>
             
             {(currentUser?.uid === selectedArticle.authorId) && (
-              <div className="flex gap-4 ml-auto">
+              <div className="flex gap-4 ml-auto w-full md:w-auto pt-4 md:pt-0">
                 <button 
                   onClick={() => onEdit?.(selectedArticle.id)}
                   className="flex items-center gap-2 text-indigo-600 hover:text-indigo-800 transition-colors"
@@ -124,14 +109,14 @@ export default function InfoKita({ onEdit, onNavigate }: { onEdit?: (id: string)
             )}
           </div>
 
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-12 leading-[1.1] tracking-tight">{selectedArticle.title}</h1>
+          <h1 className="text-3xl md:text-5xl font-bold text-gray-900 mb-8 md:mb-12 leading-[1.1] tracking-tight">{selectedArticle.title}</h1>
           
-          <div className="prose prose-lg prose-indigo max-w-none prose-p:text-gray-600 prose-p:leading-loose">
+          <div className="prose prose-sm md:prose-lg prose-indigo max-w-none prose-p:text-gray-600 prose-p:leading-loose">
             <ReactMarkdown rehypePlugins={[rehypeRaw]}>{selectedArticle.content}</ReactMarkdown>
           </div>
         </motion.div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
           {articles.length > 0 ? articles.map((article, idx) => (
             <motion.div 
               key={article.id}
@@ -139,16 +124,16 @@ export default function InfoKita({ onEdit, onNavigate }: { onEdit?: (id: string)
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: idx * 0.05 }}
               onClick={() => setSelectedArticle(article)}
-              className="bg-white border border-gray-200 rounded-sm p-8 hover:border-indigo-600 transition-all cursor-pointer group shadow-sm hover:shadow-xl hover:shadow-indigo-50"
+              className="bg-white border border-gray-200 rounded-sm p-6 md:p-8 hover:border-indigo-600 transition-all cursor-pointer group shadow-sm hover:shadow-xl hover:shadow-indigo-50"
             >
-              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4 group-hover:text-indigo-600 transition-colors">
-                {article.authorName} • {article.createdAt?.toDate?.()?.toLocaleDateString?.() || 'Update'}
+              <p className="text-[9px] md:text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3 md:mb-4 group-hover:text-indigo-600 transition-colors">
+                {displayAuthor(article.authorName)} • {article.createdAt?.toDate?.()?.toLocaleDateString?.() || 'Update'}
               </p>
-              <h3 className="text-2xl font-bold text-gray-900 mb-6 group-hover:tracking-tight transition-all line-clamp-2 leading-tight">
+              <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-4 md:mb-6 group-hover:tracking-tight transition-all line-clamp-2 leading-tight">
                 {article.title}
               </h3>
-              <div className="pt-6 border-t border-gray-50 flex justify-between items-center">
-                <span className="text-[10px] font-bold text-indigo-600 uppercase tracking-[0.2em] flex items-center gap-2">
+              <div className="pt-4 md:pt-6 border-t border-gray-50 flex justify-between items-center">
+                <span className="text-[9px] md:text-[10px] font-bold text-indigo-600 uppercase tracking-[0.2em] flex items-center gap-2">
                    Read Full <BookOpen className="w-3 h-3" />
                 </span>
                 <span className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-300 group-hover:bg-indigo-600 group-hover:text-white transition-all">

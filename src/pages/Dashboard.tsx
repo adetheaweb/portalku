@@ -91,15 +91,15 @@ export default function Dashboard({ user, onNavigate, onEdit }: { user: any, onN
   );
 
   return (
-    <div className="space-y-10 animate-in fade-in duration-700">
-      <div className="flex justify-between items-end pb-8 border-b border-gray-200">
+    <div className="space-y-6 md:space-y-10 animate-in fade-in duration-700 pb-12">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6 pb-8 border-b border-gray-200">
         <div>
-          <h2 className="text-4xl font-bold text-gray-900 tracking-tight">Admin Area</h2>
-          <p className="text-gray-500 mt-2 text-lg">Kelola konten portal Anda di sini.</p>
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight">Admin Area</h2>
+          <p className="text-gray-500 mt-2 text-base md:text-lg">Kelola konten portal Anda di sini.</p>
         </div>
         <button 
           onClick={() => onNavigate('admin-write')}
-          className="bg-indigo-600 text-white px-8 py-3 rounded-sm font-bold text-xs uppercase tracking-[0.2em] hover:bg-indigo-700 transition-all shadow-md flex items-center gap-3"
+          className="w-full sm:w-auto bg-indigo-600 text-white px-8 py-3 rounded-sm font-bold text-xs uppercase tracking-[0.2em] hover:bg-indigo-700 transition-all shadow-md flex items-center justify-center gap-3"
         >
           <FileText className="w-4 h-4" /> Tulis Artikel
         </button>

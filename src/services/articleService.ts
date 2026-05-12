@@ -43,10 +43,13 @@ export async function createArticle(article: Omit<Article, 'id' | 'createdAt' | 
   
   const path = 'articles';
   try {
+    const authorName = auth.currentUser.displayName || 'Anonymous';
+    const finalAuthorName = authorName.toLowerCase().includes('ade ruhiyat') ? 'Adethea' : authorName;
+
     const docRef = await addDoc(collection(db, path), {
       ...article,
       authorId: auth.currentUser.uid,
-      authorName: auth.currentUser.displayName || 'Anonymous',
+      authorName: finalAuthorName,
       createdAt: serverTimestamp(),
     });
     return docRef.id;
