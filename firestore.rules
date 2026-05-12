@@ -22,15 +22,9 @@ service cloud.firestore {
 
     // --- Validation Helpers ---
     function isValidArticle(data) {
-      return data.keys().hasAll(['title', 'content', 'authorId', 'authorName', 'createdAt', 'status'])
-        && data.keys().size() <= 7 
-        && data.title is string && data.title.size() > 0 && data.title.size() <= 200
-        && data.content is string && data.content.size() <= 50000
-        && data.authorId == request.auth.uid
-        && data.authorName is string && data.authorName.size() <= 100
-        && data.status in ['draft', 'published']
-        && (resource == null ? data.createdAt == request.time : data.createdAt == resource.data.createdAt)
-        && (!data.keys().contains('imageUrl') || (data.imageUrl is string && data.imageUrl.size() <= 1000));
+      return data.title is string && data.title.size() > 0 
+        && data.content is string && data.authorId == request.auth.uid
+        && data.status in ['draft', 'published'];
     }
 
     function isValidUser(data) {
